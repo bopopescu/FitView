@@ -1,0 +1,9 @@
+[Core]
+Name=Multi importer
+Module=multi
+
+[Documentation]
+Author=Christopher Kreitz
+Version=0.1
+Description=Default activity importer
+Website=https://www.example.com

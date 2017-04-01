@@ -1,0 +1,9 @@
+[Core]
+Name=Swimming importer
+Module=swimming
+
+[Documentation]
+Author=Christopher Kreitz
+Version=0.1
+Description=Swimming activity importer
+Website=https://www.example.com

@@ -1,0 +1,9 @@
+[Core]
+Name=Cycling importer
+Module=cycling
+
+[Documentation]
+Author=Christopher Kreitz
+Version=0.1
+Description=Swimming activity importer
+Website=https://www.example.com
