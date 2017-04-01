@@ -90,3 +90,7 @@ ENV/
 
 test*
 data/
+
+.project
+.pydevproject
+
