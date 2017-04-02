@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="menu">
+    <file>img/database_import.svg</file>
+    <file>img/file_blanc_star.svg</file>
+    <file>img/folder_file_open.svg</file>
+    <file>img/import-export.svg</file>
+    <file>img/No.svg</file>
+  </qresource>
+</RCC>

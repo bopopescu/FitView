@@ -118,10 +118,10 @@ class Swimming(IPlugin,Plugin):
                 self._alchemy_logbook.execute(stmt,data)
 
     @timing
-    def get_data(self):
+    def get_data(self,filehash):
         
         s = self.swim_table.join(self.file_table).\
-        select().where(self.file_table.c.file_hash==self._metadata.file_hash)
+        select().where(self.file_table.c.file_hash==filehash)
 
         strokes_data  = TimeSeriesData(name="strokes" ,labels=[],data=[],unit=None)
         avg_strokes   = TimeSeriesData(name="avg strokes",labels=[],data=[],unit="Strokes/lap")
@@ -186,6 +186,8 @@ class Swimming(IPlugin,Plugin):
 #            self._formdata.append(TimeSeriesMetaData("Total time",total_time,"s"))
             self._formdata.append(TimeSeriesMetaData("Total calories",total_calories,"kcal"))
             self._formdata.append(TimeSeriesMetaData("Event duration","%.1f" %(event_duration/60),"min"))
+            
+        return self._data
 
     @property
     def ui(self):

@@ -83,10 +83,10 @@ class Running(IPlugin,Plugin):
             self._alchemy_logbook.execute(self.running_table.insert(),data)
 
     @timing
-    def get_data(self):
+    def get_data(self,filehash):
         
         s = self.running_table.join(self.file_table).\
-        select().where(self.file_table.c.file_hash==self._metadata.file_hash)
+        select().where(self.file_table.c.file_hash==filehash)
 
         cadence    = TimeSeriesData(name="cadence"   ,labels=[],data=[],unit='rpm')
         distance   = TimeSeriesData(name="distance"  ,labels=[],data=[],unit='m')
@@ -132,6 +132,8 @@ class Running(IPlugin,Plugin):
             self._formdata.append(TimeSeriesMetaData("average speed","%.1f" %(1/1),"m/s"))
             self._formdata.append(TimeSeriesMetaData("Total calories",1,"kcal"))
             self._formdata.append(TimeSeriesMetaData("Event duration","%.1f" %(1),"min"))
+            
+        return self._data
 
     @property
     def ui(self):

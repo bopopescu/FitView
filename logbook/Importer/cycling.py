@@ -79,10 +79,10 @@ class Cycling(IPlugin,Plugin):
             self._alchemy_logbook.execute(self.cycling_table.insert(),data)
 
     @timing
-    def get_data(self):
+    def get_data(self,filehash):
         
         s = self.cycling_table.join(self.file_table).\
-        select().where(self.file_table.c.file_hash==self._metadata.file_hash)
+        select().where(self.file_table.c.file_hash==filehash)
 
         distance          = TimeSeriesData(name="distance"         ,labels=[],data=[],unit='m')
         enhanced_altitude = TimeSeriesData(name="enhanced_altitude",labels=[],data=[],unit='m')
@@ -96,31 +96,26 @@ class Cycling(IPlugin,Plugin):
         row = None
                
         for row in self._alchemy_logbook.execute(s):
-            if row.enhanced_altitude and row.distance and row.distance and row.heart_rate:
-                rows = rows + 1
-                
-                if last_ts == 0:
-                    last_ts = row.timestamp
+            rows = rows + 1
+            
+            if last_ts == 0:
+                last_ts = row.timestamp
 
-                ts =  ((row.timestamp-last_ts).seconds/60)
+            ts =  ((row.timestamp-last_ts).seconds/60)
 
-                
-                enhanced_altitude.data.append(row.enhanced_altitude)
-                enhanced_altitude.labels.append(ts)
-                
-                distance.data.append(row.distance-abs_len)
-                abs_len = row.distance
-                distance.labels.append(ts)
-                
-                heart_rate.data.append(row.heart_rate)
-                heart_rate.labels.append(ts)
-                
-#                speed.data.append(row.enhanced_speed)
-#                speed.labels.append(ts)
+            
+            enhanced_altitude.data.append(row.enhanced_altitude)
+            enhanced_altitude.labels.append(ts)
+            
+            distance.data.append(row.distance-abs_len)
+            abs_len = row.distance
+            distance.labels.append(ts)
+            
+            heart_rate.data.append(row.heart_rate)
+            heart_rate.labels.append(ts)
             
         if row:
             self._data = [enhanced_altitude,distance,heart_rate]
-    
             self._formdata = []
     
             self._formdata.append(TimeSeriesMetaData("Total Length",row.distance,"m"))
@@ -128,7 +123,9 @@ class Cycling(IPlugin,Plugin):
             self._formdata.append(TimeSeriesMetaData("average speed","%.1f" %(1/1),"m/s"))
             self._formdata.append(TimeSeriesMetaData("Total calories",1,"kcal"))
             self._formdata.append(TimeSeriesMetaData("Event duration","%.1f" %(1),"min"))
-
+        
+        return self._data
+    
     @property
     def ui(self):
 #        logging.debug("Building cycling UI")
