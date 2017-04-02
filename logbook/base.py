@@ -3,7 +3,7 @@ import logging
 from fitparse import FitFile
 import os.path
 from yapsy.PluginManager import PluginManager 
-from messages import EventTableEntry,LogRow
+from messages import LogMetaData
 from tools.profiling import timing
 
 class Logbook(object):
@@ -62,13 +62,11 @@ class Logbook(object):
         self.event_table = []
 
         for row in rows:
-            self.event_table.append(EventTableEntry(filehash=row.file_hash,
-                                                    date=row.creation_date,
-                                                    name=row.event_name,
-                                                    maintype=row.event_type,
-                                                    subtype=row.event_subtype,
-                                                    duration=row.duration,
-                                                    calories=row.calories))
+            self.event_table.append(LogMetaData(filehash=row.file_hash,
+                                                date=row.creation_date,
+                                                name=row.event_name,
+                                                maintype=row.event_type,
+                                                subtype=row.event_subtype))
 
     def close_logbook(self):
         self.event_table = None
@@ -145,14 +143,13 @@ class Logbook(object):
                 if x.filehash == key:
                     return self.get_event(x)
             return None
-        elif isinstance(key,EventTableEntry):
+        elif isinstance(key,LogMetaData):
             for x in self.event_table:
                 if x.filehash == key.filehash:
                     return self.get_event(x)
             return None
         else:
             return self.get_event(self.event_table[key])
-        return None
         
     @timing
     def get_event(self,event):
@@ -160,3 +157,10 @@ class Logbook(object):
             return self._plugins[event.maintype].get_data(event.filehash)
         else:
             return self._plugins["default"].get_data(event.filehash)
+        
+    @timing
+    def get_user_interfaces(self):
+        interfaces = []
+        for p in self._plugins:
+            interfaces.append((p,self._plugins[p].ui))
+        return interfaces

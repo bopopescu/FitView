@@ -16,6 +16,7 @@ import logging
 
 from logbook import Logbook
 from gui.mainwindow_ui import Ui_MainWindow
+from messages import UIList,UIData
             
 class Application(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -40,19 +41,14 @@ class Application(QMainWindow, Ui_MainWindow):
         self.selectAction = QComboBox()
         self.selectAction.insertItems(1,["One","Two","Three"])
         self.toolBar.addWidget(self.selectAction)
-
-#        self.action_Import_Files.triggered.connect(self.import_files)
-#        self.action_Import_Files.setEnabled(False)
-#        self.setWindowTitle("GView")
-#        self.action_Open_Logbook.triggered.connect(self.open_logbook)
-#        self.action_New_Logbook.triggered.connect(self.new_logbook)
-#        self.action_Close_Logbook.triggered.connect(self.close_logbook)
+        
         self.all_events_table.itemSelectionChanged.connect(self._selection_changed)
         self.all_events_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.all_events_table.hideColumn(4)
         self.graphwidget=GraphWidget(self.graph)
 
         self.all_events_table.setSortingEnabled(True)
+        self._ui_stack= {}
 
         self.actionSync_with_Garmin.setDisabled(True)
         self.actionImport_File.setDisabled(True)
@@ -70,11 +66,23 @@ class Application(QMainWindow, Ui_MainWindow):
         for selectionRange in self.all_events_table.selectedRanges():
             row = int(self.all_events_table.item(selectionRange.topRow(),4).text())
             indexes.append(row)
+            
+        index = indexes[0]
         
-        logging.info("Line %s selected"%indexes[0])
-        self.metadataStackedWidget.setCurrentIndex(indexes[0])
+        logging.info("Line %s selected"%index)
         
-        self.graphwidget.update_figure(data=self._logbook[self._event_table[indexes[0]]],title="Bar")
+        self.metadataStackedWidget.setCurrentIndex(self._ui_stack[self._event_table[index].maintype].index)
+        
+        i=0
+        for logline in self._logbook[self._event_table[index]].metadata:
+            self._ui_stack[self._event_table[index].maintype].fields[i].setText(str(logline.value))
+            i+=1
+        
+        name = self._event_table[index].name
+        
+        
+        
+        self.graphwidget.update_figure(data=self._logbook[self._event_table[indexes[0]]].data,title=name)
 
     def import_files(self):
         options = QFileDialog.Options()
@@ -123,6 +131,16 @@ class Application(QMainWindow, Ui_MainWindow):
                 self._event_table = self._logbook.events
 
                 self.all_events_table.setRowCount(len(self._event_table))
+                self._ui_stack= {}
+                
+                i=0
+                for ui in self._logbook.get_user_interfaces():
+                    (maintype,ui)= ui
+                    tmp = QWidget()
+                    tmp.setLayout(ui.ui)
+                    self.metadataStackedWidget.insertWidget(i,tmp)
+                    self._ui_stack[maintype]=UIList(index=i, ui=ui, labels=ui.labels, fields=ui.fields)
+                    i+=1
         
                 i=0
                 for ev in self._event_table:
@@ -131,9 +149,6 @@ class Application(QMainWindow, Ui_MainWindow):
                     self.all_events_table.setItem(i,2, QTableWidgetItem(ev.maintype))
                     self.all_events_table.setItem(i,3, QTableWidgetItem(ev.subtype))
                     self.all_events_table.setItem(i,4, QTableWidgetItem(str(i)))
-#                    tmp = QWidget()
-#                    tmp.setLayout(ev.ui)
-#                    self.metadataStackedWidget.insertWidget(i,tmp)
                     i+=1
             
             self.graphwidget.update_figure()

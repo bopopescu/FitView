@@ -1,5 +1,4 @@
 from yapsy.IPlugin import IPlugin
-from messages import EventTableEntry
 from messages import LogMetaData
 
 class Plugin:

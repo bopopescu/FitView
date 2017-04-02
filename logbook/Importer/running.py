@@ -1,6 +1,6 @@
 from yapsy.IPlugin import IPlugin
 from logbook.Importer import Plugin
-from messages import TimeSeriesData,TimeSeriesMetaData,LogMetaData
+from messages import TimeSeriesData,TimeSeriesMetaData,LogMetaData,UIData,TimeSeries
 from sqlalchemy import *
 import logging
 from tools.profiling import timing
@@ -15,11 +15,6 @@ class Running(IPlugin,Plugin):
         self._type=['running']
         self.logging = logging.getLogger(__name__)
         self._filename = log_name
-        self._formdata = None
-        self._data = None
-        self._metadata = None
-        self.labels=[]
-        self.lineedits = []
         
         if metadata:
             self._metadata = LogMetaData(file_hash=metadata.file_hash,
@@ -28,7 +23,13 @@ class Running(IPlugin,Plugin):
                                  maintype=metadata.event_type,
                                  subtype=metadata.event_subtype
                                  )
-
+        self._formdata = []
+        self._formdata.append(TimeSeriesMetaData("Total Length",0,"m"))
+        self._formdata.append(TimeSeriesMetaData("Time per 100m","%.1f" %0,"s"))
+        self._formdata.append(TimeSeriesMetaData("average speed","%.1f" %0,"m/s"))
+        self._formdata.append(TimeSeriesMetaData("Total calories",0,"kcal"))
+        self._formdata.append(TimeSeriesMetaData("Event duration","%.1f" %0,"min"))
+            
     @timing
     def open_logbook(self,filename):
         self._filename = filename
@@ -88,10 +89,10 @@ class Running(IPlugin,Plugin):
         s = self.running_table.join(self.file_table).\
         select().where(self.file_table.c.file_hash==filehash)
 
-        cadence    = TimeSeriesData(name="cadence"   ,labels=[],data=[],unit='rpm')
-        distance   = TimeSeriesData(name="distance"  ,labels=[],data=[],unit='m')
-        heart_rate = TimeSeriesData(name="heart_rate",labels=[],data=[],unit="bpm")
-        speed      = TimeSeriesData(name="speed"     ,labels=[],data=[],unit="m/s")
+        cadence    = TimeSeriesData(name="cadence"   ,labels=[],data=[],unit='rpm',xlabel="duration(min)")
+        distance   = TimeSeriesData(name="distance"  ,labels=[],data=[],unit='m',xlabel="duration(min)")
+        heart_rate = TimeSeriesData(name="heart_rate",labels=[],data=[],unit="bpm",xlabel="duration(min)")
+        speed      = TimeSeriesData(name="speed"     ,labels=[],data=[],unit="m/s",xlabel="duration(min)")
         
         rows = 0
         abs_len = 0
@@ -123,25 +124,29 @@ class Running(IPlugin,Plugin):
                 speed.labels.append(ts)
             
         if row:
-            self._data = [cadence,distance,heart_rate,speed]
+            data = [cadence,distance,heart_rate,speed]
     
-            self._formdata = []
+            formdata = []
     
-            self._formdata.append(TimeSeriesMetaData("Total Length",row.distance,"m"))
-            self._formdata.append(TimeSeriesMetaData("Time per 100m","%.1f" %1,"s"))
-            self._formdata.append(TimeSeriesMetaData("average speed","%.1f" %(1/1),"m/s"))
-            self._formdata.append(TimeSeriesMetaData("Total calories",1,"kcal"))
-            self._formdata.append(TimeSeriesMetaData("Event duration","%.1f" %(1),"min"))
+            formdata.append(TimeSeriesMetaData("Total Length",row.distance,"m"))
+            formdata.append(TimeSeriesMetaData("Time per 100m","%.1f" %1,"s"))
+            formdata.append(TimeSeriesMetaData("average speed","%.1f" %(1/1),"m/s"))
+            formdata.append(TimeSeriesMetaData("Total calories",1,"kcal"))
+            formdata.append(TimeSeriesMetaData("Event duration","%.1f" %(1),"min"))
             
-        return self._data
+        return TimeSeries(data=data,metadata=formdata)
 
     @property
     def ui(self):
-#        logging.debug("Building running UI")
         layout = QFormLayout()
-        self.labels=[]
-        self.lineedits=[]
+        labels=[]
+        fields=[]
         if self._formdata:
             for i in range(len(self._formdata)):
-                layout.addRow(QLabel(self._formdata[i].name+" ("+self._formdata[i].unit+")"), QLineEdit(str(self._formdata[i].value)))
-        return layout
+                labels.append(QLabel(self._formdata[i].name+" ("+self._formdata[i].unit+")"))
+                fields.append(QLineEdit(str(self._formdata[i].value)))
+                layout.addRow(labels[-1], 
+                              fields[-1]
+                              )
+                
+        return UIData(ui=layout,labels=labels,fields=fields)

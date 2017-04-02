@@ -1,6 +1,6 @@
 from yapsy.IPlugin import IPlugin
 from logbook.Importer import Plugin
-from messages import TimeSeriesData,TimeSeriesMetaData,LogMetaData
+from messages import TimeSeriesData,TimeSeriesMetaData,LogMetaData,UIData
 import logging
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QFormLayout, QLineEdit
 
@@ -35,12 +35,17 @@ class Default(IPlugin,Plugin):
     @property
     def ui(self):
         layout = QFormLayout()
-        self.labels=[]
-        self.lineedits=[]
+        labels=[]
+        fields=[]
         if self._formdata:
             for i in range(len(self._formdata)):
-                layout.addRow(QLabel(self._formdata[i].name+" ("+self._formdata[i].unit+")"), QLineEdit(str(self._formdata[i].value)))
-        return layout
+                labels.append(QLabel(self._formdata[i].name+" ("+self._formdata[i].unit+")"))
+                fields.append(QLineEdit(str(self._formdata[i].value)))
+                layout.addRow(labels[-1], 
+                              fields[-1]
+                              )
+                
+        return UIData(ui=layout,labels=labels,fields=fields)
     
     @property
     def metadata(self):

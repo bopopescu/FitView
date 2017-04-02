@@ -1,6 +1,6 @@
 from yapsy.IPlugin import IPlugin
 from logbook.Importer import Plugin
-from messages import TimeSeriesData,TimeSeriesMetaData,LogMetaData
+from messages import TimeSeriesData,TimeSeriesMetaData,LogMetaData,UIData,TimeSeries
 from sqlalchemy import *
 import logging
 from tools.profiling import timing
@@ -15,11 +15,6 @@ class Swimming(IPlugin,Plugin):
         self._type=['swimming']
         self.logging = logging.getLogger(__name__)
         self._filename = log_name
-        self._formdata = None
-        self._data = None
-        self._metadata = None
-        self.labels=[]
-        self.lineedits = []
         self.file_table = None
         
         if metadata:
@@ -29,6 +24,15 @@ class Swimming(IPlugin,Plugin):
                                  maintype=metadata.event_type,
                                  subtype=metadata.event_subtype
                                  )
+            
+        self._formdata = []
+
+        self._formdata.append(TimeSeriesMetaData("Lap length",0,"m"))
+        self._formdata.append(TimeSeriesMetaData("Total Length",0,"m"))
+        self._formdata.append(TimeSeriesMetaData("Time per 100m","%.1f" %0,"s"))
+        self._formdata.append(TimeSeriesMetaData("average speed","%.1f" %0,"m/s"))
+        self._formdata.append(TimeSeriesMetaData("Total calories",0,"kcal"))
+        self._formdata.append(TimeSeriesMetaData("Event duration","%.1f" %0,"min"))
 
     def open_logbook(self,filename):
         self._filename = filename
@@ -123,10 +127,10 @@ class Swimming(IPlugin,Plugin):
         s = self.swim_table.join(self.file_table).\
         select().where(self.file_table.c.file_hash==filehash)
 
-        strokes_data  = TimeSeriesData(name="strokes" ,labels=[],data=[],unit=None)
-        avg_strokes   = TimeSeriesData(name="avg strokes",labels=[],data=[],unit="Strokes/lap")
-        calories_data = TimeSeriesData(name="calories",labels=[],data=[],unit=None)
-        speed_data    = TimeSeriesData(name="speed"   ,labels=[],data=[],unit="min/100m")
+        strokes_data  = TimeSeriesData(name="strokes" ,labels=[],data=[],unit=None,xlabel="distance(m)")
+        avg_strokes   = TimeSeriesData(name="avg strokes",labels=[],data=[],unit="Strokes/lap",xlabel="distance(m)")
+        calories_data = TimeSeriesData(name="calories",labels=[],data=[],unit=None,xlabel="distance(m)")
+        speed_data    = TimeSeriesData(name="speed"   ,labels=[],data=[],unit="min/100m",xlabel="distance(m)")
         
         rows = 0
         total_calories = 0
@@ -177,25 +181,27 @@ class Swimming(IPlugin,Plugin):
             
             time_per_hundred = (100/lap_distance)*(event_duration/lap_distance)
     
-            self._formdata = []
+            formdata = []
     
-            self._formdata.append(TimeSeriesMetaData("Lap length",lap_distance,"m"))
-            self._formdata.append(TimeSeriesMetaData("Total Length",total_length,"m"))
-            self._formdata.append(TimeSeriesMetaData("Time per 100m","%.1f" %time_per_hundred,"s"))
-            self._formdata.append(TimeSeriesMetaData("average speed","%.1f" %(total_length/event_duration),"m/s"))
-#            self._formdata.append(TimeSeriesMetaData("Total time",total_time,"s"))
-            self._formdata.append(TimeSeriesMetaData("Total calories",total_calories,"kcal"))
-            self._formdata.append(TimeSeriesMetaData("Event duration","%.1f" %(event_duration/60),"min"))
+            formdata.append(TimeSeriesMetaData("Lap length",lap_distance,"m"))
+            formdata.append(TimeSeriesMetaData("Total Length",total_length,"m"))
+            formdata.append(TimeSeriesMetaData("Time per 100m","%.1f" %time_per_hundred,"s"))
+            formdata.append(TimeSeriesMetaData("average speed","%.1f" %(total_length/event_duration),"m/s"))
+            formdata.append(TimeSeriesMetaData("Total calories",total_calories,"kcal"))
+            formdata.append(TimeSeriesMetaData("Event duration","%.1f" %(event_duration/60),"min"))
             
-        return self._data
+        return TimeSeries(data=self._data,metadata=formdata)
 
     @property
     def ui(self):
         layout = QFormLayout()
-        self.labels=[]
-        self.lineedits=[]
-        if self._formdata or True:
+        labels=[]
+        fields=[]
+        if self._formdata:
             for i in range(len(self._formdata)):
-                layout.addRow(QLabel(self._formdata[i].name+" ("+self._formdata[i].unit+")"), QLineEdit(str(self._formdata[i].value)))
+                labels.append(QLabel(self._formdata[i].name+" ("+self._formdata[i].unit+")"))
+                fields.append(QLineEdit(str(self._formdata[i].value)))
+                layout.addRow(labels[-1], 
+                              fields[-1])
                 
-        return layout
+        return UIData(ui=layout,labels=labels,fields=fields)

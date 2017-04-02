@@ -43,7 +43,7 @@ class MatPlotLibCanvas(FigureCanvas):
                 g.set_linestyle('-')
           
 
-            self.axes.set_xlabel("XLabel")
+            self.axes.set_xlabel(data[0].xlabel)
             self.axes.set_ylabel("YLabel")
             self.axes.legend()
         self.draw()
