@@ -5,8 +5,6 @@ from sqlalchemy import *
 import logging
 from tools.profiling import timing
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit
-#from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Cycling(IPlugin,Plugin):
     
