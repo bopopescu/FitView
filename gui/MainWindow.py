@@ -41,6 +41,8 @@ class Application(QMainWindow, Ui_MainWindow):
         self.selectAction = QComboBox()
         self.selectAction.insertItems(1,["One","Two","Three"])
         self.toolBar.addWidget(self.selectAction)
+#        self.selectAction.activated[str].connect(self.selectGraph)
+        self.selectAction.activated.connect(self.selectGraph)
         
         self.all_events_table.itemSelectionChanged.connect(self._selection_changed)
         self.all_events_table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -68,21 +70,21 @@ class Application(QMainWindow, Ui_MainWindow):
             indexes.append(row)
             
         index = indexes[0]
-        
         logging.info("Line %s selected"%index)
-        
+        #show the correct metadata form on the left
         self.metadataStackedWidget.setCurrentIndex(self._ui_stack[self._event_table[index].maintype].index)
         
+        #Fill the metadata frame
         i=0
         for logline in self._logbook[self._event_table[index]].metadata:
             self._ui_stack[self._event_table[index].maintype].fields[i].setText(str(logline.value))
             i+=1
         
+        #update the graph
         name = self._event_table[index].name
-        
-        
-        
-        self.graphwidget.update_figure(data=self._logbook[self._event_table[indexes[0]]].data,title=name)
+        data=self._logbook[self._event_table[indexes[0]]].data
+
+        self.graphwidget.update_figure(data=data,title=name)
 
     def import_files(self):
         options = QFileDialog.Options()
@@ -164,3 +166,6 @@ class Application(QMainWindow, Ui_MainWindow):
         self.settings.setValue("windowState", self.saveState())
         QMainWindow.closeEvent(self, event)
                 
+    def selectGraph(self,text):
+        self.centralwidget2.setCurrentIndex(text)
+        print(text)

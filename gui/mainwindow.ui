@@ -14,7 +14,7 @@
    <string>FitView</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -31,29 +31,11 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QSplitter" name="splitter">
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="midLineWidth">
-       <number>5</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="opaqueResize">
-       <bool>false</bool>
-      </property>
-      <property name="childrenCollapsible">
-       <bool>false</bool>
-      </property>
-      <widget class="QWidget" name="widget" native="true">
-       <layout class="QHBoxLayout" name="horizontalLayout">
+     <widget class="QStackedWidget" name="centralwidget2">
+      <widget class="QWidget" name="mainpage" native="true">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="leftMargin">
          <number>1</number>
@@ -68,9 +50,18 @@
          <number>1</number>
         </property>
         <item>
-         <widget class="QSplitter" name="splitter_2">
+         <widget class="QSplitter" name="splitter">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="midLineWidth">
+           <number>5</number>
+          </property>
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="opaqueResize">
            <bool>false</bool>
@@ -78,103 +69,138 @@
           <property name="childrenCollapsible">
            <bool>false</bool>
           </property>
-          <widget class="QWidget" name="metadataFrame" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>250</width>
-             <height>250</height>
-            </size>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
+          <widget class="QWidget" name="widget" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout">
             <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="sizeConstraint">
-             <enum>QLayout::SetDefaultConstraint</enum>
+             <number>1</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>1</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>1</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>1</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>1</number>
             </property>
             <item>
-             <widget class="QStackedWidget" name="metadataStackedWidget">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
+             <widget class="QSplitter" name="splitter_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
+              <property name="opaqueResize">
+               <bool>false</bool>
               </property>
-              <property name="currentIndex">
-               <number>1</number>
+              <property name="childrenCollapsible">
+               <bool>false</bool>
               </property>
-              <widget class="QWidget" name="page"/>
-              <widget class="QWidget" name="page_2"/>
+              <widget class="QWidget" name="metadataFrame" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>250</width>
+                 <height>250</height>
+                </size>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetDefaultConstraint</enum>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QStackedWidget" name="metadataStackedWidget">
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="currentIndex">
+                   <number>1</number>
+                  </property>
+                  <widget class="QWidget" name="page"/>
+                  <widget class="QWidget" name="page_2"/>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QFrame" name="graph">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+              </widget>
              </widget>
             </item>
            </layout>
           </widget>
-          <widget class="QFrame" name="graph">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+          <widget class="QTableWidget" name="all_events_table">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
            </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <column>
+            <property name="text">
+             <string>Event Date</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Event Name</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Event Type</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Event Subtype</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>RowID</string>
+            </property>
+           </column>
           </widget>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QTableWidget" name="all_events_table">
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::SingleSelection</enum>
-       </property>
-       <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
-       </property>
-       <column>
-        <property name="text">
-         <string>Event Date</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Event Name</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Event Type</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Event Subtype</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>RowID</string>
-        </property>
-       </column>
-      </widget>
+      <widget class="QWidget" name="swimpage"/>
+      <widget class="QWidget" name="runpage"/>
+      <widget class="QWidget" name="cyclingpage"/>
      </widget>
     </item>
    </layout>

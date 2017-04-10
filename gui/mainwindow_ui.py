@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow - Copy.ui'
 #
 # Created by: PyQt5 UI code generator 5.5.1
 #
@@ -14,11 +14,19 @@ class Ui_MainWindow(object):
         MainWindow.resize(800, 500)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3.setSpacing(0)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.centralwidget2 = QtWidgets.QStackedWidget(self.centralwidget)
+        self.centralwidget2.setObjectName("centralwidget2")
+        self.mainpage = QtWidgets.QWidget()
+        self.mainpage.setObjectName("mainpage")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.mainpage)
+        self.verticalLayout.setContentsMargins(1, 1, 1, 1)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.splitter = QtWidgets.QSplitter(self.centralwidget)
+        self.splitter = QtWidgets.QSplitter(self.mainpage)
         self.splitter.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.splitter.setFrameShadow(QtWidgets.QFrame.Plain)
         self.splitter.setMidLineWidth(5)
@@ -84,6 +92,17 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.all_events_table.setHorizontalHeaderItem(4, item)
         self.verticalLayout.addWidget(self.splitter)
+        self.centralwidget2.addWidget(self.mainpage)
+        self.swimpage = QtWidgets.QWidget()
+        self.swimpage.setObjectName("swimpage")
+        self.centralwidget2.addWidget(self.swimpage)
+        self.runpage = QtWidgets.QWidget()
+        self.runpage.setObjectName("runpage")
+        self.centralwidget2.addWidget(self.runpage)
+        self.cyclingpage = QtWidgets.QWidget()
+        self.cyclingpage.setObjectName("cyclingpage")
+        self.centralwidget2.addWidget(self.cyclingpage)
+        self.verticalLayout_3.addWidget(self.centralwidget2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
