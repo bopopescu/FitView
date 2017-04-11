@@ -107,19 +107,20 @@ class Logbook(object):
                             event_name = record_data.value.decode('utf-8')
                             
             try:
-                file_insert = self._file_table.insert()
-                f_id = file_insert.values(file_name=filename,file_hash=filehash,
-                                          creation_date=creation_date,event_name=event_name,
-                                          event_type=event_sport, event_subtype=event_subsport)
-                conn = self._alchemy_logbook.connect()
-                conn.execute(f_id)
-                
-                if event_sport not in self._plugins:
-                    self.logging.info("delegating the import to plugin \"default\"")
-                    self._plugins["default"].import_fit(fitfile)
-                else:
-                    self.logging.info("delegating the import to plugin \"%s\""%event_sport)
-                    self._plugins[event_sport].import_fit(fitfile)
+                if event_sport in self._plugins:
+                    file_insert = self._file_table.insert()
+                    f_id = file_insert.values(file_name=filename,file_hash=filehash,
+                                              creation_date=creation_date,event_name=event_name,
+                                              event_type=event_sport, event_subtype=event_subsport)
+                    conn = self._alchemy_logbook.connect()
+                    conn.execute(f_id)
+                    
+                    if event_sport not in self._plugins:
+                        self.logging.info("delegating the import to plugin \"default\"")
+                        self._plugins["default"].import_fit(fitfile)
+                    else:
+                        self.logging.info("delegating the import to plugin \"%s\""%event_sport)
+                        self._plugins[event_sport].import_fit(fitfile)
                     
             except Exception as e:
                 self.logging.debug(e)

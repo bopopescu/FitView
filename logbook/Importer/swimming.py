@@ -42,7 +42,7 @@ class Swimming(IPlugin,Plugin):
         self.swim_table = Table("event_swimming",_metadata,
                                 Column('event_swimming_id',Integer,primary_key=True),
                                 Column('f_id',Integer,ForeignKey("file.file_id"), nullable=False),
-                                Column('event_timestamp',DateTime),
+                                Column('timestamp',DateTime),
                                 Column('start_time',DateTime),
                                 Column('swim_stroke',String(30)),
                                 Column('total_calories',Integer),
@@ -54,7 +54,6 @@ class Swimming(IPlugin,Plugin):
 
     @timing
     def import_fit(self,fitfile=None):
-        print("Swimming is importing")
         stmt = self.file_table.select(self.file_table.c.file_hash==fitfile.digest)
         row = stmt.execute().fetchone()
         
@@ -93,7 +92,7 @@ class Swimming(IPlugin,Plugin):
                     fields +=1
                     
             if fields == 6:
-                data.append({'f_id':file_id,'event_timestamp':event_timestamp,
+                data.append({'f_id':file_id,'timestamp':event_timestamp,
                              'start_time':start_time,'swim_stroke':swim_stroke,
                              'total_calories':total_calories,'total_elapsed_time':total_elapsed_time,
                              'total_strokes':total_strokes})
@@ -113,10 +112,10 @@ class Swimming(IPlugin,Plugin):
                     distance = record_data.value
                     
             if event_timestamp and distance:
-                data.append({'timestamp':event_timestamp,'distance':distance})
+                data.append({'evtimestamp':event_timestamp,'distance':distance})
 
                 stmt = self.swim_table.update().\
-                where(self.swim_table.c.event_timestamp==bindparam('timestamp')).\
+                where(self.swim_table.c.timestamp==bindparam('evtimestamp')).\
                 values(distance=bindparam('distance'))
                 self._alchemy_logbook.execute(stmt,data)
 
@@ -126,10 +125,10 @@ class Swimming(IPlugin,Plugin):
         s = self.swim_table.join(self.file_table).\
         select().where(self.file_table.c.file_hash==filehash)
 
-        strokes_data  = TimeSeriesData(name="strokes" ,labels=[],data=[],unit=None,xlabel="distance(m)")
-        avg_strokes   = TimeSeriesData(name="avg strokes",labels=[],data=[],unit="Strokes/lap",xlabel="distance(m)")
-        calories_data = TimeSeriesData(name="calories",labels=[],data=[],unit=None,xlabel="distance(m)")
-        speed_data    = TimeSeriesData(name="speed"   ,labels=[],data=[],unit="min/100m",xlabel="distance(m)")
+        strokes_data  = TimeSeriesData(name="strokes" ,labels=[],data=[],unit=None,xlabel="duration(min)")
+        avg_strokes   = TimeSeriesData(name="avg strokes",labels=[],data=[],unit="Strokes/lap",xlabel="duration(min)")
+        calories_data = TimeSeriesData(name="calories",labels=[],data=[],unit=None,xlabel="duration(min)")
+        speed_data    = TimeSeriesData(name="speed"   ,labels=[],data=[],unit="min/100m",xlabel="duration(min)")
         
         rows = 0
         total_calories = 0
@@ -148,25 +147,36 @@ class Swimming(IPlugin,Plugin):
         speed_data.labels.append(0)
 
         stro = 0
-
+        
+        last_ts = 0
         row = None
                
         for row in self._alchemy_logbook.execute(s):
             if row.total_strokes and row.distance and row.total_calories and row.total_elapsed_time:
                 rows = rows + 1
+                
+                if last_ts == 0:
+                    last_ts = row.timestamp
+    
+                ts =  ((row.timestamp-last_ts).seconds/60)
+            
                 strokes_data.data.append(row.total_strokes)
-                strokes_data.labels.append(row.distance)
+                strokes_data.labels.append(ts)
+#                strokes_data.labels.append(row.distance)
                 
                 stro = stro + row.total_strokes
                 
                 avg_strokes.data.append((stro/row.distance)*50)
-                avg_strokes.labels.append(row.distance)
+                avg_strokes.labels.append(ts)
+#                avg_strokes.labels.append(row.distance)
                 
                 calories_data.data.append(row.total_calories)
-                calories_data.labels.append(row.distance)
+                calories_data.labels.append(ts)
+#                calories_data.labels.append(row.distance)
                 
                 speed_data.data.append(((row.total_elapsed_time/50)*100)/60) #FIXME
-                speed_data.labels.append(row.distance)
+                speed_data.labels.append(ts)
+#                speed_data.labels.append(row.distance)
                 
                 total_calories = total_calories + row.total_calories
                 event_duration = event_duration + row.total_elapsed_time
