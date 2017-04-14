@@ -44,7 +44,9 @@ class Running(IPlugin,Plugin):
                                 Column('cadence',Integer),
                                 Column('distance',Integer),
                                 Column('enhanced_speed',Float),
-                                Column('heart_rate',Integer)
+                                Column('heart_rate',Integer),
+                                Column('position_lat',Float),
+                                Column('position_long',Float)
                                 )
         self.running_table.create(checkfirst=True)
 
@@ -61,6 +63,8 @@ class Running(IPlugin,Plugin):
             distance = None
             enhanced_speed = None
             heart_rate = None
+            lat = None
+            lon = None
             
             data = []
             
@@ -75,10 +79,15 @@ class Running(IPlugin,Plugin):
                     enhanced_speed = record_data.value
                 if record_data.name == "heart_rate":
                     heart_rate = record_data.value
+                if record_data.name == "position_lat":
+                    lat = record_data.value*(180.0/2**31)
+                if record_data.name == "position_long":
+                    lon = record_data.value*(180.0/2**31)
                     
             data.append({'f_id':file_id,'timestamp':timestamp,
                          'cadence':cadence,'distance':distance,
-                         'enhanced_speed':enhanced_speed,'heart_rate':heart_rate})
+                         'enhanced_speed':enhanced_speed,'heart_rate':heart_rate,
+                         'position_lat':lat,'position_long':lon})
             
 
             self._alchemy_logbook.execute(self.running_table.insert(),data)
