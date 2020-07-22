@@ -1519,7 +1519,7 @@ FIELD_TYPES = {
             101: 'length',
             103: 'monitoring_info',
             105: 'pad',
-            106: 'slave_device',
+            106: 'subordinate_device',
             127: 'connectivity',
             128: 'weather_conditions',
             129: 'weather_alert',
@@ -1729,7 +1729,7 @@ FIELD_TYPES = {
             43: 'windsurfing',
             44: 'kitesurfing',
             45: 'tactical',
-            46: 'jumpmaster',
+            46: 'jumpmain',
             47: 'boxing',
             48: 'floor_climbing',
             254: 'all',  # All is for goals only to include all sports.
@@ -1815,7 +1815,7 @@ FIELD_TYPES = {
             0x08: 'windsurfing',
             0x10: 'kitesurfing',
             0x20: 'tactical',
-            0x40: 'jumpmaster',
+            0x40: 'jumpmain',
             0x80: 'boxing',
         },
     ),
@@ -6422,7 +6422,7 @@ MESSAGE_TYPES = {
         },
     ),
     106: MessageType(
-        name='slave_device',
+        name='subordinate_device',
         mesg_num=106,
         fields={
             0: Field(
